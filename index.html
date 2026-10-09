@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon blason personnel</title>
+  <style>
+    :root {
+      --ink: #173b36;
+      --ink-soft: #45645d;
+      --gold: #bd9250;
+      --gold-pale: #ead8b5;
+      --paper: #fbf8f0;
+      --panel: #fffdf8;
+      --line: #d9d1bf;
+      --muted: #8d9488;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 28px;
+      color: var(--ink);
+      background: #e9e7df;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .toolbar {
+      width: min(210mm, 100%);
+      margin: 0 auto 14px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      font-family: Arial, sans-serif;
+    }
+
+    .toolbar button {
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 18px;
+      color: white;
+      background: var(--ink);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .toolbar button:hover { background: #28564e; }
+    .toolbar .secondary { color: var(--ink); background: var(--gold-pale); }
+    .toolbar .secondary:hover { background: #dfc895; }
+    .save-status {
+      align-self: center;
+      color: var(--ink-soft);
+      font: 12px Arial, sans-serif;
+    }
+
+    .sheet {
+      position: relative;
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      padding: 13mm 14mm 11mm;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(234,216,181,.22), transparent 42%),
+        var(--paper);
+      box-shadow: 0 12px 45px rgba(28, 43, 37, .16);
+    }
+
+    .sheet::before {
+      position: absolute;
+      inset: 6mm;
+      border: 1px solid var(--gold-pale);
+      content: "";
+      pointer-events: none;
+    }
+
+    .header { position: relative; text-align: center; }
+    .header::before {
+      display: block;
+      margin: 0 auto 2px;
+      color: var(--gold);
+      content: "♛";
+      font-size: 25px;
+      line-height: 1;
+    }
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--gold);
+      font: 700 9px/1.2 Arial, sans-serif;
+      letter-spacing: .27em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 31px;
+      line-height: 1.1;
+      letter-spacing: .04em;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      margin: 6px 0 13px;
+      color: var(--ink-soft);
+      font: 11px/1.4 Arial, sans-serif;
+      letter-spacing: .05em;
+    }
+
+    .shield {
+      position: relative;
+      isolation: isolate;
+      width: 100%;
+      min-height: 148mm;
+      margin: 4mm auto 0;
+      padding: 5px;
+      background: linear-gradient(135deg, #d7b56f, #8e682e 48%, #dfc27d);
+      clip-path: polygon(7% 0, 93% 0, 100% 8%, 100% 67%, 96% 77%, 50% 100%, 4% 77%, 0 67%, 0 8%);
+      filter: drop-shadow(0 5px 7px rgba(28, 43, 37, .16));
+    }
+
+    .shield::before {
+      position: absolute;
+      z-index: -1;
+      inset: 5px;
+      background: var(--paper);
+      clip-path: polygon(7% 0, 93% 0, 100% 8%, 100% 67%, 96% 77%, 50% 100%, 4% 77%, 0 67%, 0 8%);
+      content: "";
+    }
+
+    .shield-content {
+      display: flex;
+      flex-direction: column;
+      min-height: 148mm;
+      padding: 8mm 12mm 11mm;
+    }
+
+    .motto {
+      position: relative;
+      display: grid;
+      grid-template-columns: 105px 1fr;
+      align-items: center;
+      min-height: 48px;
+      margin: 0 0 9px;
+      padding: 7px 16px;
+      border: 1px solid var(--gold);
+      background: linear-gradient(90deg, rgba(234,216,181,.65), rgba(255,253,248,.96) 18%, rgba(255,253,248,.96) 82%, rgba(234,216,181,.65));
+      box-shadow: 0 2px 0 rgba(189, 146, 80, .18);
+    }
+
+    .motto::before, .motto::after {
+      position: absolute;
+      top: 50%;
+      width: 7px;
+      height: 7px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      background: var(--paper);
+      content: "";
+      transform: translateY(-50%);
+    }
+    .motto::before { left: -4px; }
+    .motto::after { right: -4px; }
+
+    .motto-label {
+      color: var(--gold);
+      font: 700 9px Arial, sans-serif;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+    .motto-text {
+      min-height: 28px;
+      padding: 6px 9px;
+      border-bottom: 1px dashed var(--line);
+      color: var(--ink);
+      font-size: 16px;
+      font-style: italic;
+      text-align: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 2px solid var(--gold);
+      background: rgba(255, 253, 248, .74);
+      box-shadow: inset 0 0 0 3px rgba(234,216,181,.55);
+    }
+
+    .panel {
+      position: relative;
+      min-height: 67px;
+      padding: 12px 14px 10px;
+      border: 1px solid rgba(189,146,80,.62);
+      background: rgba(255, 253, 248, .45);
+    }
+
+    .panel::before {
+      position: absolute;
+      top: 0;
+      left: 14px;
+      width: 34px;
+      border-top: 3px solid var(--gold);
+      content: "";
+    }
+
+    .panel h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 7px;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .number {
+      display: inline-grid;
+      width: 19px;
+      height: 19px;
+      place-items: center;
+      border: 1px solid var(--gold-pale);
+      border-radius: 50%;
+      color: var(--gold);
+      font: 700 9px Arial, sans-serif;
+    }
+
+    .entries { display: grid; gap: 4px; }
+    .entry {
+      display: grid;
+      grid-template-columns: 19px 1fr;
+      align-items: end;
+      gap: 7px;
+      min-height: 17px;
+      color: var(--ink-soft);
+      font: 10px Arial, sans-serif;
+    }
+
+    .entry .n { color: var(--gold); font-size: 9px; text-align: center; }
+    .write-line {
+      display: block;
+      min-height: 17px;
+      padding: 2px 3px 1px;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink);
+      font: 12px Georgia, serif;
+      outline: none;
+    }
+
+    [contenteditable="true"]:focus {
+      border-bottom-color: var(--gold);
+      background: rgba(234, 216, 181, .15);
+    }
+
+    [data-placeholder]:empty::before {
+      color: #b2b2a8;
+      content: attr(data-placeholder);
+      font-style: italic;
+    }
+
+    .verbs .write-line { font-style: italic; }
+    .fears .write-line { border-bottom-style: dashed; }
+
+    .totem {
+      display: grid;
+      grid-template-columns: 1fr 92px 1fr;
+      align-items: center;
+      width: 82%;
+      min-height: 70px;
+      margin: 9px auto 0;
+      padding: 8px 12px;
+      border: 1px solid var(--gold);
+      background: linear-gradient(110deg, rgba(234,216,181,.34), rgba(255,253,248,.95) 43%, rgba(234,216,181,.34));
+    }
+
+    .totem h2 {
+      margin: 0 0 5px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .totem p {
+      margin: 0;
+      color: var(--ink-soft);
+      font: 10px/1.45 Arial, sans-serif;
+    }
+
+    .crest {
+      display: grid;
+      width: 69px;
+      height: 75px;
+      margin: 0 auto;
+      place-items: center;
+      clip-path: polygon(0 0, 100% 0, 100% 64%, 50% 100%, 0 64%);
+      border: 0;
+      background: var(--gold-pale);
+    }
+
+    .crest-inner {
+      display: grid;
+      width: 61px;
+      height: 67px;
+      place-items: center;
+      clip-path: polygon(0 0, 100% 0, 100% 64%, 50% 100%, 0 64%);
+      background: var(--paper);
+      color: #b99b69;
+      font: 29px Georgia, serif;
+    }
+
+    .totem-write {
+      min-height: 25px;
+      margin-top: 5px;
+      border-bottom: 1px dashed var(--gold);
+      font: 14px Georgia, serif;
+      outline: none;
+    }
+
+    .totem-sketch {
+      min-height: 52px;
+      padding: 7px;
+      border: 1px dashed var(--gold-pale);
+      color: #b2b2a8;
+      font: italic 9px/1.4 Arial, sans-serif;
+      text-align: center;
+      outline: none;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      color: var(--muted);
+      font: 8px Arial, sans-serif;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    @page { size: A4 portrait; margin: 0; }
+    @media print {
+      body { padding: 0; background: white; }
+      .toolbar { display: none; }
+      .sheet { width: 210mm; height: 297mm; min-height: 0; margin: 0; box-shadow: none; }
+      .shield, .shield-content { min-height: 148mm; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+
+    @media screen and (max-width: 700px) {
+      body { padding: 12px; }
+      .sheet { width: 100%; min-height: 0; padding: 28px 14px; }
+      .sheet::before { inset: 8px; }
+      .shield { min-height: 0; margin-top: 8px; clip-path: polygon(7% 0, 93% 0, 100% 4%, 100% 83%, 50% 100%, 0 83%, 0 4%); }
+      .shield::before { clip-path: polygon(7% 0, 93% 0, 100% 4%, 100% 83%, 50% 100%, 0 83%, 0 4%); }
+      .shield-content { min-height: 0; padding: 24px 22px 34px; }
+      .motto { grid-template-columns: 1fr; gap: 4px; text-align: center; }
+      .grid { grid-template-columns: 1fr 1fr; }
+      .panel { min-height: 100px; padding: 10px 8px; }
+      .panel h2 { font-size: 12px; }
+      .totem { width: 94%; grid-template-columns: 1fr 64px 1fr; gap: 6px; padding: 8px; }
+      .crest { width: 55px; height: 61px; }
+      .crest-inner { width: 49px; height: 54px; }
+      .totem-sketch { min-height: 52px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <span class="save-status" id="save-status" aria-live="polite"></span>
+    <button class="secondary" type="button" id="save-button">Enregistrer</button>
+    <button class="secondary" type="button" id="download-button">Télécharger une copie HTML</button>
+    <button type="button" onclick="window.print()">Imprimer / enregistrer en PDF</button>
+  </div>
+
+  <main class="sheet">
+    <header class="header">
+      <p class="eyebrow">Portrait &amp; repères personnels</p>
+      <h1>Mon blason</h1>
+      <p class="subtitle">Une boussole pour mieux me connaître et avancer</p>
+    </header>
+
+    <section class="shield" aria-label="Blason personnel">
+      <div class="shield-content">
+        <section class="motto" aria-label="Ma devise">
+          <div class="motto-label">Ma devise</div>
+          <div class="motto-text" contenteditable="true" data-placeholder="La phrase qui me guide…"></div>
+        </section>
+
+        <div class="grid">
+      <section class="panel">
+        <h2><span class="number">I</span> Mes 3 forces</h2>
+        <div class="entries">
+          <div class="entry"><span class="n">01</span><span class="write-line" contenteditable="true" data-placeholder="Une qualité, un talent…"></span></div>
+          <div class="entry"><span class="n">02</span><span class="write-line" contenteditable="true" data-placeholder=""></span></div>
+          <div class="entry"><span class="n">03</span><span class="write-line" contenteditable="true" data-placeholder=""></span></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2><span class="number">II</span> Mes 3 axes de progression</h2>
+        <div class="entries">
+          <div class="entry"><span class="n">01</span><span class="write-line" contenteditable="true" data-placeholder="Ce que je souhaite développer…"></span></div>
+          <div class="entry"><span class="n">02</span><span class="write-line" contenteditable="true" data-placeholder=""></span></div>
+          <div class="entry"><span class="n">03</span><span class="write-line" contenteditable="true" data-placeholder=""></span></div>
+        </div>
+      </section>
+
+      <section class="panel verbs">
+        <h2><span class="number">III</span> Mes 3 verbes d’action</h2>
+        <div class="entries">
+          <div class="entry"><span class="n">01</span><span class="write-line" contenteditable="true" data-placeholder="Un verbe à l’infinitif…"></span></div>
+          <div class="entry"><span class="n">02</span><span class="write-line" contenteditable="true" data-placeholder=""></span></div>
+          <div class="entry"><span class="n">03</span><span class="write-line" contenteditable="true" data-placeholder=""></span></div>
+        </div>
+      </section>
+
+      <section class="panel fears">
+        <h2><span class="number">IV</span> Mes 3 craintes</h2>
+        <div class="entries">
+          <div class="entry"><span class="n">01</span><span class="write-line" contenteditable="true" data-placeholder="Ce qui me freine ou m’inquiète…"></span></div>
+          <div class="entry"><span class="n">02</span><span class="write-line" contenteditable="true" data-placeholder=""></span></div>
+          <div class="entry"><span class="n">03</span><span class="write-line" contenteditable="true" data-placeholder=""></span></div>
+        </div>
+      </section>
+        </div>
+
+        <section class="totem" aria-label="Mon animal totem">
+          <div>
+            <h2>Mon animal totem</h2>
+            <p>L’animal qui me représente, m’inspire ou me rappelle ma façon d’avancer.</p>
+            <div class="totem-write" contenteditable="true" data-placeholder="Son nom…"></div>
+          </div>
+          <div class="crest" aria-hidden="true"><div class="crest-inner">✧</div></div>
+          <div class="totem-sketch" contenteditable="true" data-placeholder="Dessine-le, colle une image ou note ce qu’il symbolise…"></div>
+        </section>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Mon identité · Mes ressources · Mon chemin</span>
+      <span contenteditable="true" data-placeholder="Date : …"></span>
+    </footer>
+  </main>
+  <script>
+    (() => {
+      const storageKey = "mon-blason-personnel-v1";
+      const editableFields = [...document.querySelectorAll('[contenteditable="true"]')];
+      const status = document.getElementById("save-status");
+
+      function saveBlason() {
+        const values = editableFields.map((field) => field.innerHTML);
+        localStorage.setItem(storageKey, JSON.stringify(values));
+        status.textContent = "Enregistré sur cet appareil";
+      }
+
+      function restoreBlason() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+          if (Array.isArray(saved)) {
+            editableFields.forEach((field, index) => {
+              if (typeof saved[index] === "string") field.innerHTML = saved[index];
+            });
+            status.textContent = "Dernière version chargée";
+          }
+        } catch (error) {
+          status.textContent = "";
+        }
+      }
+
+      document.getElementById("save-button").addEventListener("click", saveBlason);
+      document.getElementById("download-button").addEventListener("click", () => {
+        const copy = document.documentElement.cloneNode(true);
+        copy.querySelector(".toolbar")?.remove();
+        const html = "<!DOCTYPE html>\\n" + copy.outerHTML;
+        const file = new Blob([html], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(file);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "mon-blason-personnel.html";
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+
+      restoreBlason();
+    })();
+  </script>
+</body>
+</html>
