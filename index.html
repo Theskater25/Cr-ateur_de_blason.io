@@ -260,6 +260,37 @@
 
     .verbs .write-line { font-style: italic; }
     .fears .write-line { border-bottom-style: dashed; }
+    .totem-justification {
+      min-height: 42px;
+      margin-top: 7px;
+      padding: 5px 3px;
+      border-bottom: 1px dashed var(--line);
+      color: var(--ink);
+      font: 11px/1.4 Georgia, serif;
+      outline: none;
+    }
+
+    .failure-section {
+      margin-top: 12px;
+      padding: 13px 16px;
+      border: 1px solid var(--gold);
+      background: rgba(255, 253, 248, .8);
+      box-shadow: inset 0 0 0 3px rgba(234,216,181,.45);
+    }
+    .failure-section h2 {
+      margin: 0 0 7px;
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .failure-story {
+      min-height: 92px;
+      padding: 6px 3px;
+      border-bottom: 1px dashed var(--line);
+      color: var(--ink);
+      font: 12px/1.5 Georgia, serif;
+      outline: none;
+    }
 
     .totem {
       display: grid;
@@ -314,15 +345,32 @@
       outline: none;
     }
 
-    .totem-sketch {
-      min-height: 52px;
-      padding: 7px;
+    .totem-image-area {
+      display: grid;
+      min-height: 62px;
+      place-items: center;
+      padding: 5px;
       border: 1px dashed var(--gold-pale);
-      color: #b2b2a8;
+      color: #8d9488;
       font: italic 9px/1.4 Arial, sans-serif;
       text-align: center;
-      outline: none;
     }
+    .totem-image-area img {
+      display: none;
+      max-width: 100%;
+      max-height: 75px;
+      object-fit: contain;
+    }
+    .totem-image-area.has-image img { display: block; }
+    .totem-image-area.has-image .image-prompt { display: none; }
+    .image-upload {
+      display: block;
+      margin-top: 4px;
+      color: var(--ink-soft);
+      font: 9px Arial, sans-serif;
+      cursor: pointer;
+    }
+    .image-upload input { width: 100%; font: 9px Arial, sans-serif; }
 
     .footer {
       display: flex;
@@ -338,8 +386,8 @@
     @media print {
       body { padding: 0; background: white; }
       .toolbar { display: none; }
-      .sheet { width: 210mm; height: 297mm; min-height: 0; margin: 0; box-shadow: none; }
-      .shield, .shield-content { min-height: 148mm; }
+      .sheet { width: 210mm; height: auto; min-height: 297mm; margin: 0; overflow: visible; box-shadow: none; }
+      .shield, .shield-content { min-height: 165mm; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     }
 
@@ -355,9 +403,14 @@
       .panel { min-height: 100px; padding: 10px 8px; }
       .panel h2 { font-size: 12px; }
       .totem { width: 94%; grid-template-columns: 1fr 64px 1fr; gap: 6px; padding: 8px; }
+      .totem-justification { min-height: 55px; }
+      .failure-section { padding: 11px 10px; }
+      .failure-story { min-height: 110px; }
       .crest { width: 55px; height: 61px; }
       .crest-inner { width: 49px; height: 54px; }
-      .totem-sketch { min-height: 52px; }
+      .totem-image-area { min-height: 62px; }
+      .totem-image-area img { max-height: 65px; }
+      .image-upload input { font-size: 8px; }
     }
   </style>
 </head>
@@ -426,11 +479,25 @@
             <h2>Mon animal totem</h2>
             <p>L’animal qui me représente, m’inspire ou me rappelle ma façon d’avancer.</p>
             <div class="totem-write" contenteditable="true" data-placeholder="Son nom…"></div>
+            <div class="totem-justification" contenteditable="true" data-placeholder="Pourquoi ai-je choisi cet animal ? Qu’est-ce qui me ressemble chez lui ?"></div>
           </div>
           <div class="crest" aria-hidden="true"><div class="crest-inner">✧</div></div>
-          <div class="totem-sketch" contenteditable="true" data-placeholder="Dessine-le, colle une image ou note ce qu’il symbolise…"></div>
+          <div>
+            <div class="totem-image-area" id="totem-image-area">
+              <span class="image-prompt">Choisis une image depuis ton ordinateur</span>
+              <img id="totem-image" alt="Image de mon animal totem">
+            </div>
+            <label class="image-upload">Ajouter une image
+              <input id="totem-image-input" type="file" accept="image/*">
+            </label>
+          </div>
         </section>
       </div>
+    </section>
+
+    <section class="failure-section" aria-label="Mon échec">
+      <h2>Mon échec</h2>
+      <div class="failure-story" contenteditable="true" data-placeholder="Raconte un échec important, ce que tu as ressenti, ce que tu en as appris et comment tu as rebondi…"></div>
     </section>
 
     <footer class="footer">
@@ -443,26 +510,65 @@
       const storageKey = "mon-blason-personnel-v1";
       const editableFields = [...document.querySelectorAll('[contenteditable="true"]')];
       const status = document.getElementById("save-status");
+      const imageInput = document.getElementById("totem-image-input");
+      const totemImage = document.getElementById("totem-image");
+      const imageArea = document.getElementById("totem-image-area");
 
       function saveBlason() {
-        const values = editableFields.map((field) => field.innerHTML);
-        localStorage.setItem(storageKey, JSON.stringify(values));
-        status.textContent = "Enregistré sur cet appareil";
+        const saved = {
+          values: editableFields.map((field) => field.innerHTML),
+          totemImage: totemImage.getAttribute("src") || ""
+        };
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(saved));
+          status.textContent = "Enregistré sur cet appareil";
+        } catch (error) {
+          status.textContent = "Image trop volumineuse pour être enregistrée";
+        }
       }
 
       function restoreBlason() {
         try {
           const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
-          if (Array.isArray(saved)) {
+          const values = Array.isArray(saved) ? saved : saved?.values;
+          if (Array.isArray(values)) {
             editableFields.forEach((field, index) => {
-              if (typeof saved[index] === "string") field.innerHTML = saved[index];
+              if (typeof values[index] === "string") field.innerHTML = values[index];
             });
+            if (!Array.isArray(saved) && saved.totemImage) {
+              totemImage.src = saved.totemImage;
+              imageArea.classList.add("has-image");
+            }
             status.textContent = "Dernière version chargée";
           }
         } catch (error) {
           status.textContent = "";
         }
       }
+
+      imageInput.addEventListener("change", () => {
+        const file = imageInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.addEventListener("load", () => {
+          const source = new Image();
+          source.addEventListener("load", () => {
+            const scale = Math.min(1, 700 / Math.max(source.width, source.height));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.round(source.width * scale);
+            canvas.height = Math.round(source.height * scale);
+            const context = canvas.getContext("2d");
+            context.fillStyle = "#ffffff";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(source, 0, 0, canvas.width, canvas.height);
+            totemImage.src = canvas.toDataURL("image/jpeg", .82);
+            imageArea.classList.add("has-image");
+            saveBlason();
+          });
+          source.src = reader.result;
+        });
+        reader.readAsDataURL(file);
+      });
 
       document.getElementById("save-button").addEventListener("click", saveBlason);
       document.getElementById("download-button").addEventListener("click", () => {
